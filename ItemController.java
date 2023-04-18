@@ -67,22 +67,15 @@ public class ItemController {
 		}
 	}
 	
-	@GetMapping("/items")
-	public ResponseEntity<List<Item>> searchItemsByNameOrSku(
-	        @RequestParam(value = "name", required = false) String name,
-	        @RequestParam(value = "sku", required = false) String sku) {
-	    List<Item> items;
-	    if (name != null) {
-	        items = itemRepository.findByNameContainingIgnoreCase(name);
-	    } else if (sku != null) {
-	        items = itemRepository.findBySkuContainingIgnoreCase(sku);
-	    } else {
-	        items = itemRepository.findAll();
-	    }
-	    if (items.isEmpty()) {
-	        return ResponseEntity.notFound().build();
-	    } else {
-	        return ResponseEntity.ok(items);
-	    }
+	@GetMapping(params = {"name"})
+	public ResponseEntity<List<Item>> findItemsByName(@RequestParam String name) {
+   		 List<Item> items = itemRepository.findByNameContainingIgnoreCase(name);
+   		 return ResponseEntity.ok().body(items);
+	}
+
+	@GetMapping(params = {"sku"})
+	public ResponseEntity<Item> findItemBySku(@RequestParam String sku) {
+  		  Optional<Item> item = itemRepository.findBySku(sku);
+  		  return item.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
 	}
 }
